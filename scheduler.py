@@ -3,52 +3,45 @@ import random
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-
-def random_delay(min_seconds=1, max_seconds=3):
-    time.sleep(random.uniform(min_seconds, max_seconds))
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
 
 def submit_form():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/chromium"
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument("--disable-gpu")
 
-    driver = None
+    service = Service("/usr/bin/chromedriver")
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
     try:
-        driver = webdriver.Chrome(options=chrome_options)
         driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
+        time.sleep(3)
 
-        # Wait for page to load
-        time.sleep(2)
+        # Random values
+        ages = ['18–24', '25–34', '35–44', '45 and above']
+        genders = ['Male', 'Female', 'Prefer not to say']
+        selected_age = random.choice(ages)
+        selected_gender = random.choice(genders)
 
-        # Simulate typing into custom editable fields
-        editable_fields = driver.find_elements(By.CSS_SELECTOR, 'div[contenteditable="true"]')
-        responses = [
-            "25–34",  # Age
-            "Male",   # Gender
-            "Yes",    # Seen wildlife photos?
-            "Weekly", # Frequency
-            "Agree",  # Impact agreement
-            "4",      # Effectiveness rating
-            "Instagram, YouTube", # Platforms
-            "YouTube",            # Most impactful
-            "Shocked",            # Reaction
-            "Agree"               # Support due to photos
-        ]
+        # Find and type into the first "Age" field
+        age_field = driver.find_elements(By.CSS_SELECTOR, 'div[role="listitem"] div[contenteditable="true"]')[0]
+        age_field.click()
+        age_field.send_keys(selected_age)
+        time.sleep(1)
 
-        for field, response in zip(editable_fields, responses):
-            field.click()
-            field.clear()
-            field.send_keys(response)
-            random_delay()
+        # Find and type into the second "Gender" field
+        gender_field = driver.find_elements(By.CSS_SELECTOR, 'div[role="listitem"] div[contenteditable="true"]')[1]
+        gender_field.click()
+        gender_field.send_keys(selected_gender)
+        time.sleep(1)
 
-        # Submit
-        submit_button = driver.find_element(By.XPATH, '//span[text()="Submit"]/ancestor::div[@role="button"]')
+        # Click submit
+        submit_button = driver.find_element(By.XPATH, '//span[contains(text(), "Submit")]')
         submit_button.click()
+        time.sleep(3)
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
     finally:
-        if driver:
-            driver.quit()
+        driver.quit()
