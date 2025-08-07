@@ -19,5 +19,6 @@ COPY . /app
 WORKDIR /app
 
 # Expose port and define entrypoint
+# other instructions...
 EXPOSE 5000
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5000"]
