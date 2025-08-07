@@ -7,6 +7,6 @@ app = Flask(__name__)
 def index():
     try:
         submit_form()
-        return "Form submitted successfully!"
+        return "✅ Form submitted successfully!"
     except Exception as e:
-        return f"❌ Error: {e}"
+        return f"❌ Error: {str(e)}"
