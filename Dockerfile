@@ -1,25 +1,16 @@
-# Base image
 FROM python:3.11-slim
 
-# Install system dependencies
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 RUN apt-get update && apt-get install -y \
-    chromium chromium-driver wget unzip curl gnupg && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    wget unzip curl chromium chromium-driver \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Chrome
-ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app code
+WORKDIR /app
 COPY . .
 
-# Expose port
-EXPOSE 5000
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Start the Flask app
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
