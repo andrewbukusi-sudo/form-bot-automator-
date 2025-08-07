@@ -3,7 +3,7 @@ from scheduler import submit_form
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "HEAD"])
 def index():
     try:
         submit_form()
