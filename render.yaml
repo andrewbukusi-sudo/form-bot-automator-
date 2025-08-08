@@ -1,6 +1,7 @@
 services:
   - type: web
     name: form-bot-automator
-    env: docker
+    env: python
     plan: free
-    autoDeploy: true
+    buildCommand: ""
+    startCommand: gunicorn main:app --bind 0.0.0.0:5000
