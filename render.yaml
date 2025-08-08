@@ -4,4 +4,4 @@ services:
     env: python
     plan: free
     buildCommand: ""
-    startCommand: gunicorn main:app --bind 0.0.0.0:5000
+    startCommand: gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 1 main:app
