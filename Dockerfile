@@ -1,16 +1,18 @@
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Install Chrome & dependencies
+RUN apt-get update && apt-get install -y wget unzip curl gnupg chromium chromium-driver && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \
-    wget unzip curl chromium chromium-driver \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Set environment variables for Chrome
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
-WORKDIR /app
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app files
 COPY . .
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
+# Start Gunicorn
 CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5000"]
